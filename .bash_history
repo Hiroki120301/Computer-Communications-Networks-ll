@@ -16,3 +16,15 @@ ls
 sudo mn --topo=single,3 --mac --arp --switch ovsk --controller=remote,ip=127.0.0.1:6653
 exit
 ovs-dpctl dump-flows
+exit
+ls
+cd ryu
+ls
+ls ryu
+ls ryu/app/
+ryu-manager
+pip3 install -r pip-requirements.txt 
+ryu-manager
+ryu-manager ryu/app/simple_switch_13.py 
+pip install eventlet==0.30.2
+ryu-manager ryu/app/simple_switch_13.py
