@@ -112,7 +112,7 @@ class LoadBalancer(app_manager.RyuApp):
             src = self.red_service_ip
 
         actions = [
-            parser.OFPActionSetField(ipv4_dst=src),
+            parser.OFPActionSetField(ipv4_dst=src)
             parser.OFPActionSetField(eth_src=self.service_mac)
         ]
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,

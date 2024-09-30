@@ -95,13 +95,13 @@ class LoadBalancer(app_manager.RyuApp):
             src = self.red_service_ip
 
         actions = [
-            parser.OFPActionSetField(arp_tpa=src),
+            parser.OFPActionSetField(arp_tpa=src)
             parser.OFPActionSetField(arp_tha=self.service_mac)
         ]
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
                                   in_port=msg.match['in_port'], actions=actions, data=msg.data)
         datapath.send_msg(out)
-
+    
     def send_ip_response(self, dp, src_mac, src_ip, msg):
         self.ip_to_mac[src_ip] = src_mac
         self.ip_to_output_port[src_ip] = msg.match['in_port']
@@ -112,7 +112,7 @@ class LoadBalancer(app_manager.RyuApp):
             src = self.red_service_ip
 
         actions = [
-            parser.OFPActionSetField(ipv4_dst=src),
+            parser.OFPActionSetField(ipv4_dst=src)
             parser.OFPActionSetField(eth_src=self.service_mac)
         ]
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
@@ -224,8 +224,7 @@ class LoadBalancer(app_manager.RyuApp):
             arp_pkt, _, _ = pkt_type.parser(pkt_data)
             src_ip, dst_ip = arp_pkt.src_ip, arp_pkt.dst_ip
             if src_ip in self.server_to_client.keys():
-                self.send_proxied_arp_response(
-                    dp=datapath, src_mac=src_mac, src_ip=src_ip)
+                self.send_proxied_arp_response()
             elif (src_ip in client_to_blue_server.keys() and dst_ip == self.blue_service_ip) or (src_ip in client_to_red_server.keys() and dst_ip == self.red_service_ip):
                 self.send_proxied_arp_request(
                     dp=datapath, src=src_ip, dst=dst_ip, msg=msg)
@@ -236,8 +235,7 @@ class LoadBalancer(app_manager.RyuApp):
             ipv4_pkt, _, _ = pkt_type.parser(pkt_data)
             src_ip, dst_ip = ipv4_pkt.src, ipv4_pkt.ds
             if src_ip in self.server_to_client.keys():
-                self.send_ip_response(
-                    dp=datapath, src_mac=src_mac, src_ip=src_ip)
+                self.send_ip_response()
             else:
                 self.send_ip_request(
                     dp=datapath, src=src, dst=dst, src_ip=src_ip, dst_ip=dst_ip, msg=msg)

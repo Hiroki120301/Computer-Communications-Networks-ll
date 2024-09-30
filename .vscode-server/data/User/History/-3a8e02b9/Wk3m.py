@@ -32,8 +32,6 @@ class LoadBalancer(app_manager.RyuApp):
         self.blue_service_ip = self.config['service_ips']['blue']
         self.red_service_ip = self.config['service_ips']['red']
 
-        self.service_mac = self.config['service_mac']
-
         # actual ips of red and blue servers
         self.h5_ip = self.config['service_ips']['blue'][0]
         self.h6_ip = self.config['service_ips']['blue'][1]
@@ -82,42 +80,13 @@ class LoadBalancer(app_manager.RyuApp):
 
         # construct out packet
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
-                                  in_port=msg.match['in_port'], actions=actions, data=msg.data)
+                                  in_port=in_port, actions=actions, data=msg.data)
         datapath.send_msg(out)
 
-    def send_proxied_arp_response(self, src_mac, src_ip, msg):
-        self.ip_to_mac[src_ip] = src_mac
-        self.ip_to_output_port[src_ip] = msg.match['in_port']
-
-        if src_ip == self.h5_ip or src_ip == self.h6.ip:
-            src = self.blue_service_ip
-        elif src_ip == self.h7_ip or src_ip == self.h8_ip:
-            src = self.red_service_ip
-
-        actions = [
-            parser.OFPActionSetField(arp_tpa=src),
-            parser.OFPActionSetField(arp_tha=self.service_mac)
-        ]
-        out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
-                                  in_port=msg.match['in_port'], actions=actions, data=msg.data)
-        datapath.send_msg(out)
-
-    def send_ip_response(self, dp, src_mac, src_ip, msg):
-        self.ip_to_mac[src_ip] = src_mac
-        self.ip_to_output_port[src_ip] = msg.match['in_port']
-
-        if src_ip == self.h5_ip or src_ip == self.h6.ip:
-            src = self.blue_service_ip
-        elif src_ip == self.h7_ip or src_ip == self.h8_ip:
-            src = self.red_service_ip
-
-        actions = [
-            parser.OFPActionSetField(ipv4_dst=src),
-            parser.OFPActionSetField(eth_src=self.service_mac)
-        ]
-        out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
-                                  in_port=msg.match['in_port'], actions=actions, data=msg.data)
-        datapath.send_msg(out)
+    def send_proxied_arp_response(self):
+        # relay arp response to clients or servers
+        # no need to insert entries into the flow table
+        # WRITE YOUR CODE HERE
 
     def send_proxied_arp_request(self, dp, src, dst, msg):
         if dst == self.blue_service_ip:
@@ -138,10 +107,10 @@ class LoadBalancer(app_manager.RyuApp):
                 arp_tha=self.ip_to_mac[dst_ip]))
 
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
-                                  in_port=msg.match['in_port'], actions=actions, data=msg.data)
+                                  in_port=in_port, actions=actions, data=msg.data)
         datapath.send_msg(out)
 
-    def send_ip_request(dp, src_mac, dst_mac, src_ip, dst_ip, msg):
+    def handle_ip_request(dp, src_mac, dst_mac, src_ip, dst_ip, msg):
         if dst_ip == self.blue_service_ip:
             if src_ip in self.client_to_blue_server.keys():
                 dst_server_ip = self.client_to_blue_server[src_ip]
@@ -164,36 +133,14 @@ class LoadBalancer(app_manager.RyuApp):
                     self.server_to_client[self.h8_ip].append(src_ip)
                     self.client_to_red_server[src_ip] = self.h8_ip
                 dst_ip = self.client_to_red_server[src_ip]
-
-        if dst_ip in self.ip_to_output_port.keys():
-            out_port = self.ip_to_output_port.keys[dst_ip]
+        
+        if dst_ip in self.ip_to_mac.keys():
+            out_port = self.ip_to_mac.keys[dst_ip]
         else:
             out_port = ofproto.OFPP_FLOOD
-
-        # modify the destination ip to actual ip of the corresponding server
-        actions = [
-            parser.OFPActionOutput(out_port),
-            parser.OFPActionSetField(ipv4_dst=dst_ip)
-        ]
-
-        if out_port != ofproto.OFPP_FLOOD:
-            match = parser.OFPMatch(
-                in_port=msg.match['in_port'], eth_dst=dst_mac, eth_src=src_mac)
-            self.add_flow(datapath, 1, match, actions)
-
-        # update the MAC address if known
-        if dst_ip in self.ip_to_mac.keys():
-            actions.append(parser.OFPActionSetField(
-                eth_dst=self.ip_to_mac[dst_ip]))
-
-        data = None
-        if msg.buffer_id == ofproto.OFP_NO_BUFFER:
-            data = msg.data
-
-        out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
-                                  in_port=msg.match['in_port'], actions=actions, data=data)
-        datapath.send_msg(out)
-
+        actions = [parser.OFPActionOutput(out_port)]
+    
+    
     def add_flow_entry(self, datapath, priority, match, actions, timeout=10):
         # helper function to insert flow entries into flow table
         # by default, the idle_timeout is set to be 10 seconds
@@ -223,24 +170,15 @@ class LoadBalancer(app_manager.RyuApp):
         if eth.ethertype == ether_types.ETH_TYPE_ARP:
             arp_pkt, _, _ = pkt_type.parser(pkt_data)
             src_ip, dst_ip = arp_pkt.src_ip, arp_pkt.dst_ip
-            if src_ip in self.server_to_client.keys():
-                self.send_proxied_arp_response(
-                    dp=datapath, src_mac=src_mac, src_ip=src_ip)
-            elif (src_ip in client_to_blue_server.keys() and dst_ip == self.blue_service_ip) or (src_ip in client_to_red_server.keys() and dst_ip == self.red_service_ip):
+            if (src_ip in client_to_blue_server.keys() and dst_ip == self.blue_service_ip) or (src_ip in client_to_red_server.keys() and dst_ip == self.red_service_ip):
                 self.send_proxied_arp_request(
                     dp=datapath, src=src_ip, dst=dst_ip, msg=msg)
             else:
-                self.send_arp_requests(
-                    dp=datapath, src=src_ip, dst=dst_ip, msg=msg)
+                self.send_arp_requests(dp=datapath, src=src_ip, dst=dst_ip, msg=msg)
         elif eth.ethertype == ether_types.ETH_TYPE_IP:
             ipv4_pkt, _, _ = pkt_type.parser(pkt_data)
-            src_ip, dst_ip = ipv4_pkt.src, ipv4_pkt.ds
-            if src_ip in self.server_to_client.keys():
-                self.send_ip_response(
-                    dp=datapath, src_mac=src_mac, src_ip=src_ip)
-            else:
-                self.send_ip_request(
-                    dp=datapath, src=src, dst=dst, src_ip=src_ip, dst_ip=dst_ip, msg=msg)
+            src_ip, dst_ip = ipv4_pkt.src, ipv4_pkt.dst
+            self.handle_ip_request(dp=datapath, src=src, dst=dst, src_ip=src_ip, dst_ip=dst_ip, msg=msg)
 
     @set_ev_cls(ofp_event.EventOFPFlowRemoved, MAIN_DISPATCHER)
     def flow_removed_handler(self, ev):
