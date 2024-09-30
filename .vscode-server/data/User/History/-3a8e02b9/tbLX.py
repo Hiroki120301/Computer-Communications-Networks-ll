@@ -66,19 +66,20 @@ class LoadBalancer(app_manager.RyuApp):
             # broadcast the msg if out port is unknown
             out_port = ofproto.OFPP_FLOOD
 
-        # modify the destination ip to actual ip of the corresponding server
         actions = [
             parser.OFPActionOutput(out_port),
             parser.OFPActionSetField(arp_tpa=dst_ip)
         ]
 
-        # update the MAC address as well if known
         if dst_ip in self.ip_to_mac.keys():
             actions.append(parser.OFPActionSetField(arp_tha=self.ip_to_mac[dst_ip]))
-        
-        # construct out packet
+
+        data = None
+        if msg.buffer_id == ofproto.OFP_NO_BUFFER:
+            data = msg.data
+
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
-                                  in_port=in_port, actions=actions, data=msg.data)
+                                  in_port=in_port, actions=actions, data=data)
         datapath.send_msg(out)
 		    
     def send_proxied_arp_response(self):
@@ -87,7 +88,9 @@ class LoadBalancer(app_manager.RyuApp):
         # WRITE YOUR CODE HERE
         
 	
-
+    """
+    when the client is making request not for the first time
+    """
     def send_proxied_arp_request(self, dp, src, dst, msg):
         if dst == self.blue_service_ip:
             dst_ip = self.client_to_blue_server[src]

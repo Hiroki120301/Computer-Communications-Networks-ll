@@ -72,11 +72,9 @@ class LoadBalancer(app_manager.RyuApp):
             parser.OFPActionSetField(arp_tpa=dst_ip)
         ]
 
-        # update the MAC address as well if known
         if dst_ip in self.ip_to_mac.keys():
             actions.append(parser.OFPActionSetField(arp_tha=self.ip_to_mac[dst_ip]))
-        
-        # construct out packet
+
         out = parser.OFPPacketOut(datapath=datapath, buffer_id=msg.buffer_id,
                                   in_port=in_port, actions=actions, data=msg.data)
         datapath.send_msg(out)
@@ -87,7 +85,9 @@ class LoadBalancer(app_manager.RyuApp):
         # WRITE YOUR CODE HERE
         
 	
-
+    """
+    when the client is making request not for the first time
+    """
     def send_proxied_arp_request(self, dp, src, dst, msg):
         if dst == self.blue_service_ip:
             dst_ip = self.client_to_blue_server[src]

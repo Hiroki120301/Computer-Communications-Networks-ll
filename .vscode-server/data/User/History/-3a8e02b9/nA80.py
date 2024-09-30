@@ -87,7 +87,9 @@ class LoadBalancer(app_manager.RyuApp):
         # WRITE YOUR CODE HERE
         
 	
-
+    """
+    when the client is making request not for the first time
+    """
     def send_proxied_arp_request(self, dp, src, dst, msg):
         if dst == self.blue_service_ip:
             dst_ip = self.client_to_blue_server[src]
