@@ -12,19 +12,28 @@ class LoadBalancer(app_manager.RyuApp):
     def __init__(self, *args, **kwargs):
         super(LoadBalancer, self).__init__(*args, **kwargs)
         # define your own attributes and states maintained by the controller
-        # WRITE YOUR CODE HERE
+        with open('lb_config.json') as f:
+            self.config = json.load(f)
+        self.client_to_server = {}
+        self.server_to_client = defaultdict(list)
 
+    """
+    broadcast the request to the server ips to receive output port
+    """
     def send_arp_requests(self, dp):
         # send arp requests to servers to learn their mac addresses
-        # WRITE YOUR CODE HERE
-
+        for service, servers in self.service_to_servers.items():
+            for server in servers:
+                self.send_arp_request(dp, server['ip'], server['mac'])
 		    
     def send_proxied_arp_response(self):
         # relay arp response to clients or servers
         # no need to insert entries into the flow table
         # WRITE YOUR CODE HERE
 	
-
+    """
+    when the client is making request not for the first time
+    """
     def send_proxied_arp_request(self):
         # relay arp requests to clients or servers
         # no need to insert entries into the flow table
@@ -33,7 +42,6 @@ class LoadBalancer(app_manager.RyuApp):
     def add_flow_entry(self, datapath, priority, match, actions, timeout=10):
         # helper function to insert flow entries into flow table
         # by default, the idle_timeout is set to be 10 seconds
-        # WRITE YOUR CODE HERE
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
 
@@ -41,20 +49,38 @@ class LoadBalancer(app_manager.RyuApp):
                                              actions)]
 
         mod = parser.OFPFlowMod(datapath=datapath, priority=priority,
-                                match=match, instructions=inst)
+                                match=match, instructions=inst, idle_timeout=timeout)
         datapath.send_msg(mod)
 
 	
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def packet_in_handler(self, ev):
         msg = ev.msg
-        dp = msg.datapath
+        datapath = msg.datapath
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+        in_port = msg.match['in_port']
         
         pkt = packet.Packet(msg.data)
         eth = pkt.get_protocol(ethernet.ethernet)
-        mac_dst = eth.dst
-        mac_src = eth.src
+
+        if eth.ethertype == ether_types.ETH_TYPE_LLDP:
+            # ignore lldp packet
+            return
         
+        # mac address of the switch
+        dst = eth.dst
+
+        # where the controller sends the packet back to
+        src = eth.src
+
+        # this is the service ip of the server
+        dp_id = datapath.id
+
+        self.mac_to_port.setdefault(dpid, {})
+        self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
+        self.mac_to_port[dpid][src] = in_port
+
         if eth.ethertype == ether_types.ETH_TYPE_ARP:
             # handle arp packets
             # WRITE YOUR CODE HERE
@@ -62,6 +88,7 @@ class LoadBalancer(app_manager.RyuApp):
         elif eth.ethertype == ether_types.ETH_TYPE_IP:
             # handle ip packets
             # WRITE YOUR CODE HERE
+    
 
     @set_ev_cls(ofp_event.EventOFPFlowRemoved, MAIN_DISPATCHER)
     def flow_removed_handler(self, ev):

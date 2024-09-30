@@ -43,7 +43,7 @@ class LoadBalancer(app_manager.RyuApp):
     broadcast the request to the server ips to receive output port
     """
     def send_arp_requests(self, dp, src, dst):
-        # handle load balancing
+        dst_ip = None
         if dst == self.blue_service_ip:
             if len(self.server_to_client[self.h5_ip]) < len(self.server_to_client[self.h6_ip]):
                 self.server_to_client[self.h5_ip].append(src)
@@ -51,7 +51,6 @@ class LoadBalancer(app_manager.RyuApp):
             else:
                 self.server_to_client[self.h6_ip].append(src)
                 self.client_to_blue_server[src] = self.h6_ip
-            dst_ip = self.client_to_blue_server[src]
         else:
             if len(self.server_to_client[self.h7_ip]) < len(self.server_to_client[self.h8_ip]):
                 self.server_to_client[self.h7_ip].append(src)
@@ -59,7 +58,6 @@ class LoadBalancer(app_manager.RyuApp):
             else:
                 self.server_to_client[self.h8_ip].append(src)
                 self.client_to_red_server[src] = self.h8_ip
-            dst_ip = self.client_to_red_server[src]
 		    
     def send_proxied_arp_response(self):
         # relay arp response to clients or servers

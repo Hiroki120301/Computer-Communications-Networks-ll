@@ -1,5 +1,5 @@
 {
-    "service_mac": "00:00:00:00:01:01",
+    "service_mac": "",
     "service_ips": {
         "blue": "10.1.2.3",
         "red": "10.1.2.4"

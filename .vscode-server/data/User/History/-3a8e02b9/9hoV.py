@@ -4,12 +4,10 @@ from ryu.controller.handler import MAIN_DISPATCHER
 from ryu.controller.handler import set_ev_cls
 from ryu.lib.packet import packet
 from ryu.ofproto import ofproto_v1_3
-
-import json
-from collections import defaultdict
-
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+from collections import defaultdict
 
 class LoadBalancer(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
@@ -21,8 +19,7 @@ class LoadBalancer(app_manager.RyuApp):
             self.config = json.load(f)
         
         # map of client to server 
-        self.client_to_blue_server = dict()
-        self.client_to_red_server = dict()
+        self.client_to_server = dict()
 
         # map of server to a list of clients assigned to each server 
         self.server_to_client = defaultdict(list)
@@ -32,40 +29,20 @@ class LoadBalancer(app_manager.RyuApp):
         self.red_service_ip = self.config['service_ips']['red']
 
         # actual ips of red and blue servers
-        self.h5_ip = self.config['service_ips']['blue'][0]
-        self.h6_ip = self.config['service_ips']['blue'][1]
-        self.h7_ip = self.config['service_ips']['red'][0]
-        self.h8_ip = self.config['service_ips']['red'][1]
-
-        self.ip_to_output_port = dict()
+        self.blue_servers_ips = self.config['service_ips']['blue']
+        self.blue_servers_ips = self.config['service_ips']['red']
 
     """
     broadcast the request to the server ips to receive output port
     """
-    def send_arp_requests(self, dp, src, dst):
-        # handle load balancing
-        if dst == self.blue_service_ip:
-            if len(self.server_to_client[self.h5_ip]) < len(self.server_to_client[self.h6_ip]):
-                self.server_to_client[self.h5_ip].append(src)
-                self.client_to_blue_server[src] = self.h5_ip
-            else:
-                self.server_to_client[self.h6_ip].append(src)
-                self.client_to_blue_server[src] = self.h6_ip
-            dst_ip = self.client_to_blue_server[src]
-        else:
-            if len(self.server_to_client[self.h7_ip]) < len(self.server_to_client[self.h8_ip]):
-                self.server_to_client[self.h7_ip].append(src)
-                self.client_to_red_server[src] = self.h7_ip
-            else:
-                self.server_to_client[self.h8_ip].append(src)
-                self.client_to_red_server[src] = self.h8_ip
-            dst_ip = self.client_to_red_server[src]
+    def send_arp_requests(self, dp):
+        pass
 		    
     def send_proxied_arp_response(self):
         # relay arp response to clients or servers
         # no need to insert entries into the flow table
         # WRITE YOUR CODE HERE
-        
+        pass
 	
     """
     when the client is making request not for the first time
@@ -74,9 +51,6 @@ class LoadBalancer(app_manager.RyuApp):
         # relay arp requests to clients or servers
         # no need to insert entries into the flow table
         # WRITE YOUR CODE HERE
-        pass
-
-    def handle_ip_request():
         pass
          
     def add_flow_entry(self, datapath, priority, match, actions, timeout=10):
@@ -110,16 +84,14 @@ class LoadBalancer(app_manager.RyuApp):
 
         if eth.ethertype == ether_types.ETH_TYPE_ARP:
             # handle arp packets
-            if src in client_to_server.keys():
-                self.send_proxied_arp_request()
-            else:
-                self.send_arp_requests(dp=datapath, dst, msg, in_port)
+            # WRITE YOUR CODE HERE
+        
         elif eth.ethertype == ether_types.ETH_TYPE_IP:
             # handle ip packets
-            self.handle_ip_request()
+            # WRITE YOUR CODE HERE
     
 
     @set_ev_cls(ofp_event.EventOFPFlowRemoved, MAIN_DISPATCHER)
     def flow_removed_handler(self, ev):
         # handle FlowRemoved event	
-        pass
+        # WRITE YOUR CODE HERE

@@ -1,0 +1,88 @@
+{
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter.notebook.ipynb"
+  },
+  "python.terminal.executeInFileDir": true,
+  "terminal.integrated.inheritEnv": false,
+  "jupyter.askForKernelRestart": false,
+  "editor.unicodeHighlight.allowedCharacters": {
+    "α": true
+  },
+  "security.workspace.trust.untrustedFiles": "open",
+  "notebook.output.textLineLimit": 100,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "yaml.customTags": [
+    "!And",
+    "!And sequence",
+    "!If",
+    "!If sequence",
+    "!Not",
+    "!Not sequence",
+    "!Equals",
+    "!Equals sequence",
+    "!Or",
+    "!Or sequence",
+    "!FindInMap",
+    "!FindInMap sequence",
+    "!Base64",
+    "!Join",
+    "!Join sequence",
+    "!Cidr",
+    "!Ref",
+    "!Sub",
+    "!Sub sequence",
+    "!GetAtt",
+    "!GetAZs",
+    "!ImportValue",
+    "!ImportValue sequence",
+    "!Select",
+    "!Select sequence",
+    "!Split",
+    "!Split sequence"
+  ],
+  "workbench.colorTheme": "Monokai",
+  "files.exclude": {
+    "**/__pycache__": true
+  },
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "emmet.syntaxProfiles": {
+    "javascript": "jsx"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.formatOnSave": true
+  },
+  "notebook.formatOnSave.enabled": true,
+  "python.defaultInterpreterPath": "/Users/nakayamadaiki/.asdf/shims/python3.11",
+  "[ruby]": {
+    "editor.defaultFormatter": "Shopify.ruby-lsp",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    "editor.rulers": [120],
+    "editor.semanticHighlighting.enabled": true
+  },
+  "rubyLsp.rubyVersionManager": {
+    "identifier": "auto"
+  },
+  "rubyLsp.linters": null,
+  "ruby.intellisense": "rubyLocate",
+  "githubPullRequests.pullBranch": "never",
+  "terminal.integrated.enableMultiLinePasteWarning": false,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "python.createEnvironment.trigger": "off",
+  "git.openRepositoryInParentFolders": "never"
+}

@@ -21,8 +21,7 @@ class LoadBalancer(app_manager.RyuApp):
             self.config = json.load(f)
         
         # map of client to server 
-        self.client_to_blue_server = dict()
-        self.client_to_red_server = dict()
+        self.client_to_server = dict()
 
         # map of server to a list of clients assigned to each server 
         self.server_to_client = defaultdict(list)
@@ -32,34 +31,16 @@ class LoadBalancer(app_manager.RyuApp):
         self.red_service_ip = self.config['service_ips']['red']
 
         # actual ips of red and blue servers
-        self.h5_ip = self.config['service_ips']['blue'][0]
-        self.h6_ip = self.config['service_ips']['blue'][1]
-        self.h7_ip = self.config['service_ips']['red'][0]
-        self.h8_ip = self.config['service_ips']['red'][1]
-
-        self.ip_to_output_port = dict()
+        self.blue_servers_ips = self.config['service_ips']['blue']
+        self.blue_servers_ips = self.config['service_ips']['red']
 
     """
     broadcast the request to the server ips to receive output port
     """
-    def send_arp_requests(self, dp, src, dst):
-        # handle load balancing
+    def send_arp_requests(self, dp, dst):
         if dst == self.blue_service_ip:
-            if len(self.server_to_client[self.h5_ip]) < len(self.server_to_client[self.h6_ip]):
-                self.server_to_client[self.h5_ip].append(src)
-                self.client_to_blue_server[src] = self.h5_ip
-            else:
-                self.server_to_client[self.h6_ip].append(src)
-                self.client_to_blue_server[src] = self.h6_ip
-            dst_ip = self.client_to_blue_server[src]
-        else:
-            if len(self.server_to_client[self.h7_ip]) < len(self.server_to_client[self.h8_ip]):
-                self.server_to_client[self.h7_ip].append(src)
-                self.client_to_red_server[src] = self.h7_ip
-            else:
-                self.server_to_client[self.h8_ip].append(src)
-                self.client_to_red_server[src] = self.h8_ip
-            dst_ip = self.client_to_red_server[src]
+            if len(self.server_to_client[self.blue_servers_ips[0]]) < len(self.server_to_client[self.blue_servers_ips[1]]):
+                
 		    
     def send_proxied_arp_response(self):
         # relay arp response to clients or servers

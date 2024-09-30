@@ -28,3 +28,7 @@ ryu-manager
 ryu-manager ryu/app/simple_switch_13.py 
 pip install eventlet==0.30.2
 ryu-manager ryu/app/simple_switch_13.py
+ryu-manager lb.py 
+which python
+python --version
+which python

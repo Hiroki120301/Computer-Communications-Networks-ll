@@ -43,7 +43,6 @@ class LoadBalancer(app_manager.RyuApp):
     broadcast the request to the server ips to receive output port
     """
     def send_arp_requests(self, dp, src, dst):
-        # handle load balancing
         if dst == self.blue_service_ip:
             if len(self.server_to_client[self.h5_ip]) < len(self.server_to_client[self.h6_ip]):
                 self.server_to_client[self.h5_ip].append(src)

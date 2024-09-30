@@ -5,43 +5,21 @@
 * the Visual Studio Code Server License Terms (https://aka.ms/vscode-server-license) and
 * the Microsoft Privacy Statement (https://privacy.microsoft.com/en-US/privacystatement).
 *
-Server bound to /tmp/code-f13fcf05-9c1d-4ecf-a7b3-2acbcc1d57cb
-Extension host agent listening on /tmp/code-f13fcf05-9c1d-4ecf-a7b3-2acbcc1d57cb
+Server bound to /tmp/code-1d5f4ced-f11e-45fe-b9fe-2efcc7cda6e3
+Extension host agent listening on /tmp/code-1d5f4ced-f11e-45fe-b9fe-2efcc7cda6e3
 
-[09:13:05] 
-
-
+[08:47:22] 
 
 
-[09:13:05] Extension host agent started.
-[09:13:05] Started initializing default profile extensions in extensions installation folder. file:///home/mininet/.vscode-server/extensions
-[09:13:05] [<unknown>][57df3812][ExtensionHostConnection] New connection established.
-[09:13:05] [<unknown>][7cfc2a97][ManagementConnection] New connection established.
-[09:13:05] Completed initializing default profile extensions in extensions installation folder. file:///home/mininet/.vscode-server/extensions
-[09:13:05] [<unknown>][57df3812][ExtensionHostConnection] <1084> Launched Extension Host Process.
-[09:14:26] [<unknown>][22687425][ManagementConnection] New connection established.
-[09:14:26] [<unknown>][74923875][ExtensionHostConnection] New connection established.
-[09:14:26] [<unknown>][74923875][ExtensionHostConnection] <1144> Launched Extension Host Process.
-[09:14:51] Getting Manifest... ms-python.python
-[09:14:51] Installing extension: ms-python.python file:///home/mininet/.vscode-server/extensions/extensions.json
-[09:14:52] Getting Manifest... ms-python.vscode-pylance
-[09:14:52] Getting Manifest... ms-python.python
-[09:14:52] Getting Manifest... ms-python.debugpy
-[09:14:52] Extension is already requested to install ms-python.python file:///home/mininet/.vscode-server/extensions/extensions.json
-[09:14:52] Installing extension: ms-python.vscode-pylance file:///home/mininet/.vscode-server/extensions/extensions.json
-[09:14:52] Installing extension: ms-python.debugpy file:///home/mininet/.vscode-server/extensions/extensions.json
-[09:15:11] Extension signature verification result for ms-python.debugpy: Success. Executed: true. Duration: 1739ms.
-[09:15:12] Extracted extension to file:///home/mininet/.vscode-server/extensions/ms-python.debugpy-2024.8.0-linux-x64: ms-python.debugpy
-[09:15:12] Renamed to /home/mininet/.vscode-server/extensions/ms-python.debugpy-2024.8.0-linux-x64
-[09:15:37] Extension signature verification result for ms-python.python: Success. Executed: true. Duration: 1160ms.
-[09:15:42] Extracted extension to file:///home/mininet/.vscode-server/extensions/ms-python.python-2024.14.0-linux-x64: ms-python.python
-[09:15:42] Renamed to /home/mininet/.vscode-server/extensions/ms-python.python-2024.14.0-linux-x64
-[09:16:03] Extension signature verification result for ms-python.vscode-pylance: Success. Executed: true. Duration: 2582ms.
-[09:16:15] Extracted extension to file:///home/mininet/.vscode-server/extensions/ms-python.vscode-pylance-2024.8.2: ms-python.vscode-pylance
-[09:16:16] Renamed to /home/mininet/.vscode-server/extensions/ms-python.vscode-pylance-2024.8.2
-[09:16:16] Extension installed successfully: ms-python.debugpy file:///home/mininet/.vscode-server/extensions/extensions.json
-[09:16:16] Extension installed successfully: ms-python.python file:///home/mininet/.vscode-server/extensions/extensions.json
-[09:16:16] Extension installed successfully: ms-python.vscode-pylance file:///home/mininet/.vscode-server/extensions/extensions.json
+
+
+[08:47:22] Extension host agent started.
+[08:47:22] [<unknown>][2876aeb4][ExtensionHostConnection] New connection established.
+[08:47:22] [<unknown>][367ceed3][ManagementConnection] New connection established.
+[08:47:22] [<unknown>][2876aeb4][ExtensionHostConnection] <816> Launched Extension Host Process.
+[08:47:51] [<unknown>][7fd5ce6e][ExtensionHostConnection] New connection established.
+[08:47:51] [<unknown>][10712530][ManagementConnection] New connection established.
+[08:47:51] [<unknown>][7fd5ce6e][ExtensionHostConnection] <919> Launched Extension Host Process.
 New EH opened, aborting shutdown
-[09:18:05] New EH opened, aborting shutdown
-[09:19:27] [<unknown>][57df3812][ExtensionHostConnection] <1084> Extension Host Process exited with code: 0, signal: null.
+[08:52:22] New EH opened, aborting shutdown
+[08:52:52] [<unknown>][2876aeb4][ExtensionHostConnection] <816> Extension Host Process exited with code: 0, signal: null.

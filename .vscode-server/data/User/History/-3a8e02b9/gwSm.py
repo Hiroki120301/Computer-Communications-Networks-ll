@@ -21,11 +21,11 @@ class LoadBalancer(app_manager.RyuApp):
             self.config = json.load(f)
         
         # map of client to server 
-        self.client_to_blue_server = dict()
-        self.client_to_red_server = dict()
+        self.client_to_server = dict()
 
         # map of server to a list of clients assigned to each server 
-        self.server_to_client = defaultdict(list)
+        self.blue_server_to_client = defaultdict(list)
+        self.red_server_to_client = defaultdict(list)
 
         # service ips of red and blue servers
         self.blue_service_ip = self.config['service_ips']['blue']
@@ -43,23 +43,21 @@ class LoadBalancer(app_manager.RyuApp):
     broadcast the request to the server ips to receive output port
     """
     def send_arp_requests(self, dp, src, dst):
-        # handle load balancing
+        dst_ip = None
         if dst == self.blue_service_ip:
             if len(self.server_to_client[self.h5_ip]) < len(self.server_to_client[self.h6_ip]):
                 self.server_to_client[self.h5_ip].append(src)
-                self.client_to_blue_server[src] = self.h5_ip
+                self.client_to_server[src] = self.h5_ip
             else:
                 self.server_to_client[self.h6_ip].append(src)
-                self.client_to_blue_server[src] = self.h6_ip
-            dst_ip = self.client_to_blue_server[src]
+                self.client_to_server[src] = self.h6_ip
         else:
             if len(self.server_to_client[self.h7_ip]) < len(self.server_to_client[self.h8_ip]):
                 self.server_to_client[self.h7_ip].append(src)
-                self.client_to_red_server[src] = self.h7_ip
+                self.client_to_server[src] = self.h7_ip
             else:
                 self.server_to_client[self.h8_ip].append(src)
-                self.client_to_red_server[src] = self.h8_ip
-            dst_ip = self.client_to_red_server[src]
+                self.client_to_server[src] = self.h8_ip
 		    
     def send_proxied_arp_response(self):
         # relay arp response to clients or servers

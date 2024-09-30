@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Ryu Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/venv/bin/ryu-manager",  // Adjust for your virtual environment path or Python installation path
+            "args": ["--verbose", "your_ryu_app.py"],  // Add your Ryu app here
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}
